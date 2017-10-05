@@ -6,6 +6,7 @@ def leerDocumento(archivo):
     allTransac = []
     for linea in transacciones.readlines():#lee linea por linea el archivo
         transac = linea.split() #me transforma el string linea en una lista
+        transac = map(int,transac) #mapea de letras a numeros (para string no deberia usarse)
         transac.sort() #ordena la lista
         allTransac.append(transac) #agrega a la lista de todas las transacciones
     return allTransac
