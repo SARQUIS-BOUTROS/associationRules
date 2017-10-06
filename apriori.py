@@ -1,97 +1,138 @@
-def initPass(transacciones):
-    itemSet = []
-    for transaccion in transacciones:
-        for item in transaccion:
-            if item not in itemSet:
-                itemSet.append(item)
-    return itemSet
+import sys
+from optparse import OptionParser
 
-def soporteMinimo(transacciones,candidatos,minSup):
-    itemsFrecuentes = []
-    for itemC in candidatos:
-        cont = 0
-        itemFrecuente = []
-        for transaccion in transacciones:
-            for itemT in transaccion:
-                if itemC == itemT:
-                    cont += 1
-        if cont >= minSup:
-            itemFrecuente = [itemC,cont]
-            itemsFrecuentes.append(itemFrecuente)
-    return itemsFrecuentes
 
-def candidateGen(setActual):#VER SI ANDA sobre todo el ultimo for separado
+
+# def confianzaMinima(itemFrecuente,minConf):
+#     '''Falta definir'''
+#
+# def apGenRules(itemsFrecuentes, consecuentes, minSup,minConf,k,m):
+#     hhx = consecuentes
+#     reglas = [] #la idea es que tenga 2 elementos, el primero para la precondicion y el segundo para la postcondicion
+#     if (k > (m+1)) and (len(consecuentes)!=0):
+#         hhxx = candidateGen(hhx)
+#         for h in hhxx:
+#             if confianzaMinima(intemFrecuente,minConf):'''falta definir'''
+#             #hacer la resta
+#                 reglas[1] = #precondicion
+#
+# '''Falta terminar'''
+# def genRules(itemsFrecunetes, minSup, minConf):
+#     rule = [] # deberia tener 2 campos: 1 para el antecedente y 1 para el consecuente [1,2] -> [3,4]
+#     hh1 = []
+#     k=2
+#     m=1
+#     while (k != len(itemsFrecunetes)):
+#         for items in itemsFrecunetes:
+#             r = []
+#             for item in items:
+#                 if item == items[len(items)-1]:
+#                     r[1].append(item)
+#                 else:
+#                     r[0].append(item)
+#                 if confianzaMinima(r,minConf): # veo si la regla r que genere cumple con la confianza
+#                     rule.append(r)
+#                     hh1.append(r[1])
+#             apGenRules(items, hh1, minSup, minConf, k, m)
+#         k += 1
+#         m += 1
+
+def subsets(arr, k):
+    ''''Hace todas las combinaciones de un set'''
+    return chain(*[combinations(arr, k) for i, a in enumerate(arr)])
+
+def candidateGen(setActual, k):
     #la carga ya se hizo en orden lexicografico, no hace falta ordenar aca
     ccx = [] #lista de candidatos
     ffx = setActual #set de items frecuentes
     for f1 in ffx:
-        c = f1 #lista de candidatos
         for f2 in ffx:
-            set1 = f1[1].sort() # el primer elemento de los fx contienen la lista de itemsFrecuentes lo ordeno lexicograficamente por las dudas
-            set2 = f2[1].sort()
-            for item1 in set1:
-                for item2 in set2:
-                    if item1 == set1(len(set1)): #me fijo primero si es el ultimo elemento de la lista
-                        if set1[len(set1)] != set2[len(set2)]: #veo si el ultimo elemento es diferente
-                            c.append(set2[len(set2)])
-                            ccx.append(c)
-                    else:
-                        if item1 != item2:
-                            continue #avanza al siguiente bucle
-        #hacemos la pregunta dentro del for de ffx
-        for candidato in c:'''ver si no tira error aca, se esta eleminando un item donde se esta iterando por eso'''
-            for item in ffx:
-                if candidato not in item[1]:#el primer element de ffx seria el nombre del item el segundo es la cantidad de beces que aparece
-                    ccx.remove(c)
+            agregar = False
+            for item1 in f1:
+                pos = f1.index(item1)
+                if item1 != f2[pos]: #me fijo primero si es el ultimo elemento de la lista
+                    if (pos == (len(f1)-1)):
+                        agregar = True
+                        break
+            if agregar:
+                c = f1.append(f2[pos])
+                ccx.append(c.sort())
+    for c in ccx:
+        for subset in subsets(c, k-1):
+            quitar = True
+            for itemSet in ffx:
+                if (subset == itemSet):
+                    quitar = False
+                    break
+            if quitar:
+                ccx.remove(c)
+
     return ccx
 
+def soporteMinimo(transacciones, candidatos, minSup, k):
+    itemsFrecuentes = []
+    f = [k, itemsFrecuentes]
+    for itemC in candidatos:
+        cont = 0
+        itemFrecuente = []
+        for transaccion in transacciones:
+            if itemC in transaccion:
+                cont += 1
+        if cont/len(transacciones) >= minSup:
+            itemFrecuente = [itemC.sort(), cont]
+            itemsFrecuentes.append(itemFrecuente)
+    return f
 
-def apriori (transacciones):
+def initPass(transacciones):
+    itemSet = []
+    for transaccion in transacciones:
+        if transaccion not in transacciones:
+            itemSet.append()
+    return itemSet
+
+def leerDocumento(archivo):
+    transacciones = open(archivo, 'r') # lee el archivo
+    allTransac = []
+    for linea in transacciones.readlines(): # lee linea por linea el archivo
+        transac = linea.split() # me transforma el string linea en una lista
+        transac = map(int, transac) # mapea de letras a numeros (para string no deberia usarse)
+        transac.sort() # ordena la lista
+        allTransac.append(transac) # agrega a la lista de todas las transacciones
+    return allTransac
+
+def apriori (transacciones, minSup, minConf):
     cc1 = initPass(transacciones) # cc=C candidatos
-    ff = soporteMinimo(cc1) # ff=F set de items frecuentes #voy a ir acoplando las f a esta lista, haria lo mismo que el algoritmo
+    ff = soporteMinimo(transacciones, cc1, minSup, k=1) # ff=F set de items frecuentes #voy a ir acoplando las f a esta lista, haria lo mismo que el algoritmo
 
-    #k = 2 #no lo uso
-    setActual = ffx
+    k = 2
+    setActual = ff
     while (len(setActual) != 0):
-        ccx = candidateGen(setActual)
-        '''falta las preguntas esas'''
-        setNuevo = soporteMinimo(ccx)
+        ccx = candidateGen(setActual, k)
+        setNuevo = soporteMinimo(transacciones, ccx, minSup, k)
         setActual = setNuevo
-        #k += 1
-        ff.append(setNuevo)#agrego a la lista de todos los F
-    return ff
-
-##GenerarReglas
-
-def confianzaMinima(itemFrecuente,minConf):
-    '''Falta definir'''
-
-def apGenRules(itemsFrecuentes, consecuentes, minSup,minConf,k,m):
-    hhx = consecuentes
-    reglas = [] #la idea es que tenga 2 elementos, el primero para la precondicion y el segundo para la postcondicion
-    if (k > (m+1)) and (len(consecuentes)!=0):
-        hhxx = candidateGen(hhx)
-        for h in hhxx:
-            if confianzaMinima(intemFrecuente,minConf):'''falta definir'''
-            #hacer la resta
-                reglas[1] = #precondicion
-'''Falta terminar'''
-def genRules(itemsFrecunetes, minSup, minConf):
-    rule = []#deberia tener 2 campos: 1 para el antecedente y 1 para el consecuente [1,2] -> [3,4]
-    hh1 = []
-    k=2
-    m=1
-    while (k!=len(itemsFrecunetes)):
-        for items in itemsFrecunetes:
-            r = []
-            for item in items:
-                if item == items(len(items)):
-                    r[2].append(item)
-                else:
-                    r[1].append(item)
-                if confianzaMinima(r,minConf):#veo si la regla r que genere cumple con la confianza
-                    rule.append(r)
-                    hh1.append(r[2])
-            apGenRules(items,hh1,minSup,minConf,k,m)
+        ff.append(setNuevo) # agrego a la lista de todos los F
         k += 1
-        m += 1
+
+    for f in ff:
+        print f
+    # reglas = genRules(transacciones, ff, minConf)
+    # return reglas
+
+if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option('-d', '--dataSet', dest='dataSet', help='Dataset a analizar')
+    parser.add_option('-s', '--minSupport', dest='minSup', help='Minimo soporte')
+    parser.add_option('-c', '--minConfidence', dest='minConf', help='Minima confianza')
+    (options, args) = parser.parse_args()
+
+    if options.dataSet is None:
+        print 'No se especifico ningun dataset. Cerrando...\n'
+        sys.exit('Cierre.')
+    elif options.dataSet is not None:
+        listaTransacciones = leerDocumento(options.dataSet)
+    else:
+        print 'Error de sistema.\n'
+        sys.exit('Cierre.')
+
+    reglas = apriori(listaTransacciones, options.minSup, options.minConf)
+    print(listaTransacciones)
