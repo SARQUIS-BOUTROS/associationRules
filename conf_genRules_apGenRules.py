@@ -34,7 +34,8 @@ def genRules (transacciones, itemsFrecuentes, minSup, minConf):
                         antecedentes.append(aux[i])
                     i += 1
                 regla = [antecedentes,consecuente]
-                print(regla)
+                reglas.append(regla)
+    return reglas
 
 
 
@@ -101,4 +102,4 @@ if __name__=="__main__":
     minSup = 0.2
     minConf = 0.3*6
     r = genRules(transacciones, ff, minSup, minConf)
-    #print (r)
+    print (r)
