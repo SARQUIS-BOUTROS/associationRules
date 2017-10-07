@@ -21,7 +21,24 @@ def confianzaMinima(transacciones, f, reglaCandidata, minConf):
     else: return False
 
 def genRules (transacciones, itemsFrecuentes, minSup, minConf):
-#la idea del codigo anterior es [1,2,3] toma primero el 1 lo agrega como consecuente y lo que queda de la lista es precedente, asi va haciendo en el bucle
+    reglas = []
+    for f in itemsFrecuentes:
+        if len(f[0]) >= 2:
+            aux = f[0]
+            for item in f[0]:
+                antecedentes = []
+                consecuente = [item]
+                i = 0
+                while i != len(f[0]):
+                    if aux[i] != item:
+                        antecedentes.append(aux[i])
+                    i += 1
+                regla = [antecedentes,consecuente]
+                print(regla)
+
+
+
+'''#la idea del codigo anterior es [1,2,3] toma primero el 1 lo agrega como consecuente y lo que queda de la lista es precedente, asi va haciendo en el bucle
     reglas = []
     hh1 = []
     for f in itemsFrecuentes:
@@ -44,6 +61,7 @@ def genRules (transacciones, itemsFrecuentes, minSup, minConf):
 
         #reglas.extend(apGenRules(f, hh1, k, m = 1)) #concateno la lista de un elemento con la de mas de un elemento
     return reglas
+'''
 '''
     def apGenRules(f, hh, k, m):
         if (k > (m + 1)) and (len(hh) != 0):
@@ -73,14 +91,14 @@ def genRules (transacciones, itemsFrecuentes, minSup, minConf):
             return reglas
 '''
 if __name__=="__main__":
-    transacciones = [[1,2,3,4],[3,4],[2,4],[1,2],[1,2],[1,2,3,4]]
-    #ff [[listaElementos], soporte]
+    #transacciones = [[1,2,3,4],[3,4],[2,4],[1,2],[1,2],[1,2,3,4]]
+    #ff [[listaElementos], soporte] primer elemento 0 segundo 1
     #confianza = soportef/cantAntecedente
     #ff = [[1],4],[[2],5],[[3],3],[[4],4],[[1,2],4],[[1,3],2],[[1,4],2],[[2,3],2],[[2,4],3],[[3,4],3],[[1,2,3],2],[[1,2,4],2],[[1,3,4],2],[[2,3,4],2],[[1,2,3,4],2]]
     #ff = [[1,2],4],[[1,3],2],[[1,4],2],[[2,3],2],[[2,4],3],[[3,4],3]
     #ff = [[1,2,3],2],[[1,2,4],2],[[1,3,4],2],[[2,3,4],2]
-    ff = [[1,2,3,4],2]]
+    #ff = [[[1,2,3,4],2],[[4,5,6,7],2]]
     minSup = 0.2
     minConf = 0.3*6
     r = genRules(transacciones, ff, minSup, minConf)
-    print (r)
+    #print (r)
