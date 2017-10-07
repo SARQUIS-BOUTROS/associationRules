@@ -1,4 +1,4 @@
-def confianzaMinima(transacciones, f, reglaCandidata, minConf):
+'''def confianzaMinima(transacciones, f, reglaCandidata, minConf):
     #faux.append(reglaCandidata[1])
     #faux.extend(reglaCandidata[2])#uno las dos partes asi me genera una sola lista con todos los elementos, itemsf es una lista de dos elementos, el antecedente y el consecuente
     antecedente = reglaCandidata[1]
@@ -18,7 +18,21 @@ def confianzaMinima(transacciones, f, reglaCandidata, minConf):
         if confianza >= minConf:
             return True
         return False
-    else: return False
+    else: return False'''
+def confianzaMinima(transacciones, f, reglaCandidata, minConf):
+    antecedentes = reglaCandidata[0]
+    soporte = f[1] #soporte es la cant de veces que aparece el f
+    antcont = 0
+    for transaccion in transacciones:
+        for item in (f[0]):
+            if (item in transaccion) and (item in antecedentes):
+                antcont += 1
+        if antcont != 0:
+            confianza = soporte/antcont
+            if confianza >= minConf:
+                return True
+            return False
+        else: return False
 
 def genRules (transacciones, itemsFrecuentes, minSup, minConf):
     reglas = []
@@ -34,7 +48,8 @@ def genRules (transacciones, itemsFrecuentes, minSup, minConf):
                         antecedentes.append(aux[i])
                     i += 1
                 regla = [antecedentes,consecuente]
-                reglas.append(regla)
+                if confianzaMinima(transacciones, f, regla, minConf):
+                    reglas.append(regla)
     return reglas
 
 
@@ -100,6 +115,6 @@ if __name__=="__main__":
     ff = [[1,2,3],2],[[1,2,4],2],[[1,3,4],2],[[2,3,4],2]
     #ff = [[[1,2,3,4],2],[[4,5,6,7],2]]
     minSup = 0.2
-    minConf = 0.3*6
+    minConf = 0.3
     r = genRules(transacciones, ff, minSup, minConf)
     print (r)
